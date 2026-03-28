@@ -3,16 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MyPix</title>
-    <link rel="stylesheet" href="style.css">
+    <title>MyPix Debug</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-    <div id="app">
-        <h1>Willkommen bei MyPix</h1>
-        <button id="loginButton">Mit GitHub anmelden</button>
-        <div id="profile"></div>
-    </div>
-    <script src="script.js"></script>
+    <h1>Debug-Modus</h1>
+    <button id="loginButton">Mit GitHub anmelden</button>
+    <div id="log" style="margin-top:20px; background:#eee; padding:10px; white-space:pre-wrap;"></div>
+
+    <script>
+        function log(msg) {
+            const logDiv = document.getElementById('log');
+            logDiv.innerHTML += new Date().toLocaleTimeString() + ': ' + msg + '<br>';
+        }
+
+        log('Skript gestartet');
+
+        const supabaseUrl = 'https://ducqtalkhvizusgnqlxx.supabase.co';
+        const supabaseKey = 'sb_publishable_lViRN7oDzpCqap-_aykfKw_pXizyP8h';
+        log('Supabase URL: ' + supabaseUrl);
+        log('Supabase Key vorhanden: ' + (supabaseKey ? 'ja' : 'nein'));
+
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+        log('Supabase Client erstellt');
+
+        const button = document.getElementById('loginButton');
+        if (!button) {
+            log('FEHLER: Button mit ID "loginButton" nicht gefunden!');
+        } else {
+            log('Button gefunden.');
+            button.onclick = async function() {
+                log('Button geklickt – starte Login...');
+                try {
+                    const { data, error } = await supabase.auth.signInWithOAuth({
+                        provider: 'github',
+                        options: { redirectTo: window.location.origin }
+                    });
+                    if (error) {
+                        log('Fehler vom Supabase: ' + error.message);
+                    } else {
+                        log('Weiterleitung zu GitHub gestartet. Sollte jetzt umleiten...');
+                    }
+                } catch (err) {
+                    log('Ausnahme: ' + err.message);
+                }
+            };
+        }
+    </script>
 </body>
 </html>
