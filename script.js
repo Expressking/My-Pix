@@ -4,20 +4,30 @@ const supabaseKey = 'sb_publishable_lViRN7oDzpCqap-_aykfKw_pXizyP8h';
 const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
 async function loginWithGitHub() {
-    const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: 'github',
-        options: {
-            redirectTo: window.location.origin
+    try {
+        alert('Button geklickt! Versuche Login mit GitHub...');
+        const { data, error } = await supabase.auth.signInWithOAuth({
+            provider: 'github',
+            options: {
+                redirectTo: window.location.origin
+            }
+        });
+        if (error) {
+            alert('Fehler: ' + error.message);
+            document.getElementById('profile').innerHTML = '<p style="color:red">Fehler: ' + error.message + '</p>';
+        } else {
+            alert('Weiterleitung zu GitHub sollte jetzt erfolgen.');
         }
-    });
-    if (error) console.error('Fehler:', error);
+    } catch (err) {
+        alert('Ausnahme: ' + err.message);
+        document.getElementById('profile').innerHTML = '<p style="color:red">Exception: ' + err.message + '</p>';
+    }
 }
 
 document.getElementById('loginButton').onclick = loginWithGitHub;
 
-supabase.auth.getSession().then(({ data: { session } }) => {
-    if (session) {
-        document.getElementById('profile').innerHTML = `<p>Hallo, ${session.user.email}</p>`;
-        document.getElementById('loginButton').style.display = 'none';
-    }
-});
+if (!document.getElementById('loginButton')) {
+    document.getElementById('profile').innerHTML = '<p style="color:red">Button mit ID "loginButton" nicht gefunden!</p>';
+} else {
+    document.getElementById('profile').innerHTML = '<p>Bereit – klicke den Button.</p>';
+}
